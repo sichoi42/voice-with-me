@@ -1,6 +1,6 @@
-import { IconCheck, IconKey, IconX } from "@tabler/icons-react";
-import { FC, KeyboardEvent, useState } from "react";
-import { SidebarButton } from "./SidebarButton";
+import { IconCheck, IconKey, IconX } from '@tabler/icons-react';
+import { FC, KeyboardEvent, useState } from 'react';
+import { SidebarButton } from './SidebarButton';
 
 interface Props {
   apiKey: string;
@@ -12,7 +12,7 @@ export const Key: FC<Props> = ({ apiKey, onApiKeyChange }) => {
   const [newKey, setNewKey] = useState(apiKey);
 
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       handleUpdateKey(newKey);
     }

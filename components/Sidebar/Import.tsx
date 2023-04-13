@@ -1,10 +1,13 @@
-import { ChatFolder, Conversation } from "@/types";
-import { cleanConversationHistory } from "@/utils/app/clean";
-import { IconFileImport } from "@tabler/icons-react";
-import { FC } from "react";
+import { ChatFolder, Conversation } from '@/types';
+import { cleanConversationHistory } from '@/utils/app/clean';
+import { IconFileImport } from '@tabler/icons-react';
+import { FC } from 'react';
 
 interface Props {
-  onImport: (data: { conversations: Conversation[]; folders: ChatFolder[] }) => void;
+  onImport: (data: {
+    conversations: Conversation[];
+    folders: ChatFolder[];
+  }) => void;
 }
 
 export const Import: FC<Props> = ({ onImport }) => {

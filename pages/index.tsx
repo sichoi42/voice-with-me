@@ -1,26 +1,43 @@
-import { Chat } from "@/components/Chat/Chat";
-import { Navbar } from "@/components/Mobile/Navbar";
-import { Sidebar } from "@/components/Sidebar/Sidebar";
-import { ChatBody, ChatFolder, Conversation, KeyValuePair, Message, OpenAIModel, OpenAIModelID, OpenAIModels } from "@/types";
-import { cleanConversationHistory, cleanSelectedConversation } from "@/utils/app/clean";
-import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
-import { saveConversation, saveConversations, updateConversation } from "@/utils/app/conversation";
-import { saveFolders } from "@/utils/app/folders";
-import { exportData, importData } from "@/utils/app/importExport";
-import { IconArrowBarLeft, IconArrowBarRight } from "@tabler/icons-react";
-import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
+import { Chat } from '@/components/Chat/Chat';
+import { Navbar } from '@/components/Mobile/Navbar';
+import { Sidebar } from '@/components/Sidebar/Sidebar';
+import {
+  ChatBody,
+  ChatFolder,
+  Conversation,
+  KeyValuePair,
+  Message,
+  OpenAIModel,
+  OpenAIModelID,
+  OpenAIModels,
+} from '@/types';
+import {
+  cleanConversationHistory,
+  cleanSelectedConversation,
+} from '@/utils/app/clean';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import {
+  saveConversation,
+  saveConversations,
+  updateConversation,
+} from '@/utils/app/conversation';
+import { saveFolders } from '@/utils/app/folders';
+import { exportData, importData } from '@/utils/app/importExport';
+import { IconArrowBarLeft, IconArrowBarRight } from '@tabler/icons-react';
+import Head from 'next/head';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
   const [folders, setFolders] = useState<ChatFolder[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation>();
+  const [selectedConversation, setSelectedConversation] =
+    useState<Conversation>();
   const [loading, setLoading] = useState<boolean>(false);
   const [models, setModels] = useState<OpenAIModel[]>([]);
-  const [lightMode, setLightMode] = useState<"dark" | "light">("dark");
+  const [lightMode, setLightMode] = useState<'dark' | 'light'>('dark');
   const [messageIsStreaming, setMessageIsStreaming] = useState<boolean>(false);
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
-  const [apiKey, setApiKey] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>('');
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
   const [isUsingEnv, setIsUsingEnv] = useState<boolean>(false);
@@ -37,12 +54,12 @@ export default function Home() {
 
         updatedConversation = {
           ...selectedConversation,
-          messages: [...updatedMessages, message]
+          messages: [...updatedMessages, message],
         };
       } else {
         updatedConversation = {
           ...selectedConversation,
-          messages: [...selectedConversation.messages, message]
+          messages: [...selectedConversation.messages, message],
         };
       }
 
@@ -55,17 +72,17 @@ export default function Home() {
         model: updatedConversation.model,
         messages: updatedConversation.messages,
         key: apiKey,
-        prompt: updatedConversation.prompt
+        prompt: updatedConversation.prompt,
       };
 
       const controller = new AbortController();
-      const response = await fetch("/api/chat", {
-        method: "POST",
+      const response = await fetch('/api/chat', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json',
         },
         signal: controller.signal,
-        body: JSON.stringify(chatBody)
+        body: JSON.stringify(chatBody),
       });
 
       if (!response.ok) {
@@ -87,11 +104,12 @@ export default function Home() {
 
       if (updatedConversation.messages.length === 1) {
         const { content } = message;
-        const customName = content.length > 30 ? content.substring(0, 30) + "..." : content;
+        const customName =
+          content.length > 30 ? content.substring(0, 30) + '...' : content;
 
         updatedConversation = {
           ...updatedConversation,
-          name: customName
+          name: customName,
         };
       }
 
@@ -101,7 +119,7 @@ export default function Home() {
       const decoder = new TextDecoder();
       let done = false;
       let isFirst = true;
-      let text = "";
+      let text = '';
 
       while (!done) {
         if (stopConversationRef.current === true) {
@@ -117,29 +135,34 @@ export default function Home() {
 
         if (isFirst) {
           isFirst = false;
-          const updatedMessages: Message[] = [...updatedConversation.messages, { role: "assistant", content: chunkValue }];
+          const updatedMessages: Message[] = [
+            ...updatedConversation.messages,
+            { role: 'assistant', content: chunkValue },
+          ];
 
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages
+            messages: updatedMessages,
           };
 
           setSelectedConversation(updatedConversation);
         } else {
-          const updatedMessages: Message[] = updatedConversation.messages.map((message, index) => {
-            if (index === updatedConversation.messages.length - 1) {
-              return {
-                ...message,
-                content: text
-              };
-            }
+          const updatedMessages: Message[] = updatedConversation.messages.map(
+            (message, index) => {
+              if (index === updatedConversation.messages.length - 1) {
+                return {
+                  ...message,
+                  content: text,
+                };
+              }
 
-            return message;
-          });
+              return message;
+            },
+          );
 
           updatedConversation = {
             ...updatedConversation,
-            messages: updatedMessages
+            messages: updatedMessages,
           };
 
           setSelectedConversation(updatedConversation);
@@ -148,13 +171,15 @@ export default function Home() {
 
       saveConversation(updatedConversation);
 
-      const updatedConversations: Conversation[] = conversations.map((conversation) => {
-        if (conversation.id === selectedConversation.id) {
-          return updatedConversation;
-        }
+      const updatedConversations: Conversation[] = conversations.map(
+        (conversation) => {
+          if (conversation.id === selectedConversation.id) {
+            return updatedConversation;
+          }
 
-        return conversation;
-      });
+          return conversation;
+        },
+      );
 
       if (updatedConversations.length === 0) {
         updatedConversations.push(updatedConversation);
@@ -169,14 +194,14 @@ export default function Home() {
   };
 
   const fetchModels = async (key: string) => {
-    const response = await fetch("/api/models", {
-      method: "POST",
+    const response = await fetch('/api/models', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        key
-      })
+        key,
+      }),
     });
 
     if (!response.ok) {
@@ -195,26 +220,29 @@ export default function Home() {
     setModelError(false);
   };
 
-  const handleLightMode = (mode: "dark" | "light") => {
+  const handleLightMode = (mode: 'dark' | 'light') => {
     setLightMode(mode);
-    localStorage.setItem("theme", mode);
+    localStorage.setItem('theme', mode);
   };
 
   const handleApiKeyChange = (apiKey: string) => {
     setApiKey(apiKey);
-    localStorage.setItem("apiKey", apiKey);
+    localStorage.setItem('apiKey', apiKey);
   };
 
   const handleEnvChange = (isUsingEnv: boolean) => {
     setIsUsingEnv(isUsingEnv);
-    localStorage.setItem("isUsingEnv", isUsingEnv.toString());
+    localStorage.setItem('isUsingEnv', isUsingEnv.toString());
   };
 
   const handleExportData = () => {
     exportData();
   };
 
-  const handleImportConversations = (data: { conversations: Conversation[]; folders: ChatFolder[] }) => {
+  const handleImportConversations = (data: {
+    conversations: Conversation[];
+    folders: ChatFolder[];
+  }) => {
     importData(data.conversations, data.folders);
     setConversations(data.conversations);
     setSelectedConversation(data.conversations[data.conversations.length - 1]);
@@ -231,7 +259,7 @@ export default function Home() {
 
     const newFolder: ChatFolder = {
       id: lastFolder ? lastFolder.id + 1 : 1,
-      name
+      name,
     };
 
     const updatedFolders = [...folders, newFolder];
@@ -249,7 +277,7 @@ export default function Home() {
       if (c.folderId === folderId) {
         return {
           ...c,
-          folderId: 0
+          folderId: 0,
         };
       }
 
@@ -264,7 +292,7 @@ export default function Home() {
       if (f.id === folderId) {
         return {
           ...f,
-          name
+          name,
         };
       }
 
@@ -284,7 +312,7 @@ export default function Home() {
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0
+      folderId: 0,
     };
 
     const updatedConversations = [...conversations, newConversation];
@@ -299,33 +327,43 @@ export default function Home() {
   };
 
   const handleDeleteConversation = (conversation: Conversation) => {
-    const updatedConversations = conversations.filter((c) => c.id !== conversation.id);
+    const updatedConversations = conversations.filter(
+      (c) => c.id !== conversation.id,
+    );
     setConversations(updatedConversations);
     saveConversations(updatedConversations);
 
     if (updatedConversations.length > 0) {
-      setSelectedConversation(updatedConversations[updatedConversations.length - 1]);
+      setSelectedConversation(
+        updatedConversations[updatedConversations.length - 1],
+      );
       saveConversation(updatedConversations[updatedConversations.length - 1]);
     } else {
       setSelectedConversation({
         id: 1,
-        name: "New conversation",
+        name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0
+        folderId: 0,
       });
-      localStorage.removeItem("selectedConversation");
+      localStorage.removeItem('selectedConversation');
     }
   };
 
-  const handleUpdateConversation = (conversation: Conversation, data: KeyValuePair) => {
+  const handleUpdateConversation = (
+    conversation: Conversation,
+    data: KeyValuePair,
+  ) => {
     const updatedConversation = {
       ...conversation,
-      [data.key]: data.value
+      [data.key]: data.value,
     };
 
-    const { single, all } = updateConversation(updatedConversation, conversations);
+    const { single, all } = updateConversation(
+      updatedConversation,
+      conversations,
+    );
 
     setSelectedConversation(single);
     setConversations(all);
@@ -333,23 +371,23 @@ export default function Home() {
 
   const handleClearConversations = () => {
     setConversations([]);
-    localStorage.removeItem("conversationHistory");
+    localStorage.removeItem('conversationHistory');
 
     setSelectedConversation({
       id: 1,
-      name: "New conversation",
+      name: 'New conversation',
       messages: [],
       model: OpenAIModels[OpenAIModelID.GPT_3_5],
       prompt: DEFAULT_SYSTEM_PROMPT,
-      folderId: 0
+      folderId: 0,
     });
-    localStorage.removeItem("selectedConversation");
+    localStorage.removeItem('selectedConversation');
 
     setFolders([]);
-    localStorage.removeItem("folders");
+    localStorage.removeItem('folders');
 
     setIsUsingEnv(false);
-    localStorage.removeItem("isUsingEnv");
+    localStorage.removeItem('isUsingEnv');
   };
 
   useEffect(() => {
@@ -365,52 +403,58 @@ export default function Home() {
   }, [apiKey]);
 
   useEffect(() => {
-    const theme = localStorage.getItem("theme");
+    const theme = localStorage.getItem('theme');
     if (theme) {
-      setLightMode(theme as "dark" | "light");
+      setLightMode(theme as 'dark' | 'light');
     }
 
-    const apiKey = localStorage.getItem("apiKey");
+    const apiKey = localStorage.getItem('apiKey');
     if (apiKey) {
       setApiKey(apiKey);
       fetchModels(apiKey);
     }
 
-    const usingEnv = localStorage.getItem("isUsingEnv");
+    const usingEnv = localStorage.getItem('isUsingEnv');
     if (usingEnv) {
-      setIsUsingEnv(usingEnv === "true");
-      fetchModels("");
+      setIsUsingEnv(usingEnv === 'true');
+      fetchModels('');
     }
 
     if (window.innerWidth < 640) {
       setShowSidebar(false);
     }
 
-    const folders = localStorage.getItem("folders");
+    const folders = localStorage.getItem('folders');
     if (folders) {
       setFolders(JSON.parse(folders));
     }
 
-    const conversationHistory = localStorage.getItem("conversationHistory");
+    const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
-      const parsedConversationHistory: Conversation[] = JSON.parse(conversationHistory);
-      const cleanedConversationHistory = cleanConversationHistory(parsedConversationHistory);
+      const parsedConversationHistory: Conversation[] =
+        JSON.parse(conversationHistory);
+      const cleanedConversationHistory = cleanConversationHistory(
+        parsedConversationHistory,
+      );
       setConversations(cleanedConversationHistory);
     }
 
-    const selectedConversation = localStorage.getItem("selectedConversation");
+    const selectedConversation = localStorage.getItem('selectedConversation');
     if (selectedConversation) {
-      const parsedSelectedConversation: Conversation = JSON.parse(selectedConversation);
-      const cleanedSelectedConversation = cleanSelectedConversation(parsedSelectedConversation);
+      const parsedSelectedConversation: Conversation =
+        JSON.parse(selectedConversation);
+      const cleanedSelectedConversation = cleanSelectedConversation(
+        parsedSelectedConversation,
+      );
       setSelectedConversation(cleanedSelectedConversation);
     } else {
       setSelectedConversation({
         id: 1,
-        name: "New conversation",
+        name: 'New conversation',
         messages: [],
         model: OpenAIModels[OpenAIModelID.GPT_3_5],
         prompt: DEFAULT_SYSTEM_PROMPT,
-        folderId: 0
+        folderId: 0,
       });
     }
   }, []);
@@ -419,21 +463,14 @@ export default function Home() {
     <>
       <Head>
         <title>Chatbot UI</title>
-        <meta
-          name="description"
-          content="ChatGPT but better."
-        />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1"
-        />
-        <link
-          rel="icon"
-          href="/favicon.ico"
-        />
+        <meta name="description" content="ChatGPT but better." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       {selectedConversation && (
-        <main className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}>
+        <main
+          className={`flex flex-col h-screen w-screen text-white dark:text-white text-sm ${lightMode}`}
+        >
           <div className="sm:hidden w-full fixed top-0">
             <Navbar
               selectedConversation={selectedConversation}

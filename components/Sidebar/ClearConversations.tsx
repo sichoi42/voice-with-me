@@ -1,6 +1,6 @@
-import { IconCheck, IconTrash, IconX } from "@tabler/icons-react";
-import { FC, useState } from "react";
-import { SidebarButton } from "./SidebarButton";
+import { IconCheck, IconTrash, IconX } from '@tabler/icons-react';
+import { FC, useState } from 'react';
+import { SidebarButton } from './SidebarButton';
 
 interface Props {
   onClearConversations: () => void;

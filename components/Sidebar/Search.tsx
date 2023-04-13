@@ -1,5 +1,5 @@
-import { IconX } from "@tabler/icons-react";
-import { FC } from "react";
+import { IconX } from '@tabler/icons-react';
+import { FC } from 'react';
 
 interface Props {
   searchTerm: string;
@@ -12,7 +12,7 @@ export const Search: FC<Props> = ({ searchTerm, onSearch }) => {
   };
 
   const clearSearch = () => {
-    onSearch("");
+    onSearch('');
   };
 
   return (

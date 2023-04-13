@@ -1,6 +1,6 @@
-import { Conversation } from "@/types";
-import { DEFAULT_SYSTEM_PROMPT } from "@/utils/app/const";
-import { FC, useEffect, useRef, useState } from "react";
+import { Conversation } from '@/types';
+import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
+import { FC, useEffect, useRef, useState } from 'react';
 
 interface Props {
   conversation: Conversation;
@@ -8,7 +8,7 @@ interface Props {
 }
 
 export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -30,7 +30,7 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
 
   useEffect(() => {
     if (textareaRef && textareaRef.current) {
-      textareaRef.current.style.height = "inherit";
+      textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
     }
   }, [value]);
@@ -45,15 +45,21 @@ export const SystemPrompt: FC<Props> = ({ conversation, onChangePrompt }) => {
 
   return (
     <div className="flex flex-col">
-      <label className="text-left dark:text-neutral-400 text-neutral-700 mb-2">System Prompt</label>
+      <label className="text-left dark:text-neutral-400 text-neutral-700 mb-2">
+        System Prompt
+      </label>
       <textarea
         ref={textareaRef}
         className="w-full rounded-lg px-4 py-2 focus:outline-none dark:bg-[#40414F] dark:border-opacity-50 dark:border-neutral-800 dark:text-neutral-100 border border-neutral-500 shadow text-neutral-900"
         style={{
-          resize: "none",
+          resize: 'none',
           bottom: `${textareaRef?.current?.scrollHeight}px`,
-          maxHeight: "300px",
-          overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400 ? "auto" : "hidden"}`
+          maxHeight: '300px',
+          overflow: `${
+            textareaRef.current && textareaRef.current.scrollHeight > 400
+              ? 'auto'
+              : 'hidden'
+          }`,
         }}
         placeholder="Enter a prompt"
         value={value}

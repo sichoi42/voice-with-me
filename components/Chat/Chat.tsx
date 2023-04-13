@@ -1,11 +1,11 @@
-import { Conversation, KeyValuePair, Message, OpenAIModel } from "@/types";
-import { FC, MutableRefObject, useEffect, useRef, useState } from "react";
-import { ChatInput } from "./ChatInput";
-import { ChatLoader } from "./ChatLoader";
-import { ChatMessage } from "./ChatMessage";
-import { ModelSelect } from "./ModelSelect";
-import { Regenerate } from "./Regenerate";
-import { SystemPrompt } from "./SystemPrompt";
+import { Conversation, KeyValuePair, Message, OpenAIModel } from '@/types';
+import { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
+import { ChatInput } from './ChatInput';
+import { ChatLoader } from './ChatLoader';
+import { ChatMessage } from './ChatMessage';
+import { ModelSelect } from './ModelSelect';
+import { Regenerate } from './Regenerate';
+import { SystemPrompt } from './SystemPrompt';
 
 interface Props {
   conversation: Conversation;
@@ -16,14 +16,31 @@ interface Props {
   modelError: boolean;
   messageError: boolean;
   loading: boolean;
-  lightMode: "light" | "dark";
+  lightMode: 'light' | 'dark';
   onSend: (message: Message, isResend: boolean) => void;
-  onUpdateConversation: (conversation: Conversation, data: KeyValuePair) => void;
+  onUpdateConversation: (
+    conversation: Conversation,
+    data: KeyValuePair,
+  ) => void;
   onAcceptEnv: (accept: boolean) => void;
   stopConversationRef: MutableRefObject<boolean>;
 }
 
-export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, messageIsStreaming, modelError, messageError, loading, lightMode, onSend, onUpdateConversation, onAcceptEnv, stopConversationRef }) => {
+export const Chat: FC<Props> = ({
+  conversation,
+  models,
+  apiKey,
+  isUsingEnv,
+  messageIsStreaming,
+  modelError,
+  messageError,
+  loading,
+  lightMode,
+  onSend,
+  onUpdateConversation,
+  onAcceptEnv,
+  stopConversationRef,
+}) => {
   const [currentMessage, setCurrentMessage] = useState<Message>();
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
 
@@ -33,13 +50,14 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, mess
 
   const scrollToBottom = () => {
     if (autoScrollEnabled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const handleScroll = () => {
     if (chatContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
       const bottomTolerance = 30;
 
       if (scrollTop + clientHeight < scrollHeight - bottomTolerance) {
@@ -59,10 +77,10 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, mess
     const chatContainer = chatContainerRef.current;
 
     if (chatContainer) {
-      chatContainer.addEventListener("scroll", handleScroll);
+      chatContainer.addEventListener('scroll', handleScroll);
 
       return () => {
-        chatContainer.removeEventListener("scroll", handleScroll);
+        chatContainer.removeEventListener('scroll', handleScroll);
       };
     }
   }, []);
@@ -71,9 +89,15 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, mess
     <div className="relative flex-1 overflow-none dark:bg-[#343541] bg-white">
       {!apiKey && !isUsingEnv ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
-          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">OpenAI API Key Required</div>
-          <div className="text-center text-gray-500 dark:text-gray-400">Please set your OpenAI API key in the bottom left of the sidebar.</div>
-          <div className="text-center text-gray-500 dark:text-gray-400">- OR -</div>
+          <div className="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100">
+            OpenAI API Key Required
+          </div>
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            Please set your OpenAI API key in the bottom left of the sidebar.
+          </div>
+          <div className="text-center text-gray-500 dark:text-gray-400">
+            - OR -
+          </div>
           <button
             className="flex items-center justify-center mx-auto px-4 py-2 border border-transparent text-xs rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             onClick={() => onAcceptEnv(true)}
@@ -84,31 +108,45 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, mess
       ) : modelError ? (
         <div className="flex flex-col justify-center mx-auto h-full w-[300px] sm:w-[500px] space-y-6">
           <div className="text-center text-red-500">Error fetching models.</div>
-          <div className="text-center text-red-500">Make sure your OpenAI API key is set in the bottom left of the sidebar or in a .env.local file and refresh.</div>
-          <div className="text-center text-red-500">If you completed this step, OpenAI may be experiencing issues.</div>
+          <div className="text-center text-red-500">
+            Make sure your OpenAI API key is set in the bottom left of the
+            sidebar or in a .env.local file and refresh.
+          </div>
+          <div className="text-center text-red-500">
+            If you completed this step, OpenAI may be experiencing issues.
+          </div>
         </div>
       ) : (
         <>
-          <div
-            className="overflow-scroll max-h-full"
-            ref={chatContainerRef}
-          >
+          <div className="overflow-scroll max-h-full" ref={chatContainerRef}>
             {conversation.messages.length === 0 ? (
               <>
                 <div className="flex flex-col mx-auto pt-12 space-y-10 w-[350px] sm:w-[600px]">
-                  <div className="text-4xl font-semibold text-center text-gray-800 dark:text-gray-100">{models.length === 0 ? "Loading..." : "Chatbot UI"}</div>
+                  <div className="text-4xl font-semibold text-center text-gray-800 dark:text-gray-100">
+                    {models.length === 0 ? 'Loading...' : 'Chatbot UI'}
+                  </div>
 
                   {models.length > 0 && (
                     <div className="flex flex-col h-full space-y-4 border p-4 rounded border-neutral-500">
                       <ModelSelect
                         model={conversation.model}
                         models={models}
-                        onModelChange={(model) => onUpdateConversation(conversation, { key: "model", value: model })}
+                        onModelChange={(model) =>
+                          onUpdateConversation(conversation, {
+                            key: 'model',
+                            value: model,
+                          })
+                        }
                       />
 
                       <SystemPrompt
                         conversation={conversation}
-                        onChangePrompt={(prompt) => onUpdateConversation(conversation, { key: "prompt", value: prompt })}
+                        onChangePrompt={(prompt) =>
+                          onUpdateConversation(conversation, {
+                            key: 'prompt',
+                            value: prompt,
+                          })
+                        }
                       />
                     </div>
                   )}
@@ -116,7 +154,9 @@ export const Chat: FC<Props> = ({ conversation, models, apiKey, isUsingEnv, mess
               </>
             ) : (
               <>
-                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">Model: {conversation.model.name}</div>
+                <div className="flex justify-center py-2 text-neutral-500 bg-neutral-100 dark:bg-[#444654] dark:text-neutral-200 text-sm border border-b-neutral-300 dark:border-none">
+                  Model: {conversation.model.name}
+                </div>
 
                 {conversation.messages.map((message, index) => (
                   <ChatMessage
