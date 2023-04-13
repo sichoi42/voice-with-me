@@ -32,6 +32,17 @@ export const ConversationComponent: FC<Props> = ({
   const [isRenaming, setIsRenaming] = useState(false);
   const [renameValue, setRenameValue] = useState('');
 
+  const speakMessage = (content: string, rate: number) => {
+    const utterance = new SpeechSynthesisUtterance(content);
+    utterance.lang = 'ko-KR';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  };
+
   const handleEnterDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -69,10 +80,24 @@ export const ConversationComponent: FC<Props> = ({
       } ${
         selectedConversation.id === conversation.id ? 'bg-[#343541]/90' : ''
       }`}
-      onClick={() => onSelectConversation(conversation)}
       disabled={loading}
       draggable="true"
       onDragStart={(e) => handleDragStart(e, conversation)}
+      // Add Mouse or Touch Event to Speak Conversation Title
+      onMouseOver={() => speakMessage(conversation.name, 1)}
+      onClick={() => {
+        onSelectConversation(conversation);
+        speakMessage(conversation.name, 1);
+      }}
+      onTouchEnd={(event) => {
+        onSelectConversation(conversation);
+        speakMessage(conversation.name, 1);
+        event.preventDefault();
+      }}
+      onFocus={() => speakMessage(conversation.name, 1)}
+      // Add Mouse or Touch Event to Stop Speaking
+      onMouseLeave={() => stopSpeaking()}
+      onBlur={() => stopSpeaking()}
     >
       <IconMessage size={16} />
 
@@ -109,6 +134,18 @@ export const ConversationComponent: FC<Props> = ({
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+
+                if (isDeleting) {
+                  onDeleteConversation(conversation);
+                } else if (isRenaming) {
+                  handleRename(conversation);
+                }
+
+                setIsDeleting(false);
+                setIsRenaming(false);
+              }}
             />
 
             <IconX
@@ -116,6 +153,11 @@ export const ConversationComponent: FC<Props> = ({
               size={16}
               onClick={(e) => {
                 e.stopPropagation();
+                setIsDeleting(false);
+                setIsRenaming(false);
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
                 setIsDeleting(false);
                 setIsRenaming(false);
               }}
@@ -135,6 +177,11 @@ export const ConversationComponent: FC<Props> = ({
                 setIsRenaming(true);
                 setRenameValue(selectedConversation.name);
               }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                setIsRenaming(true);
+                setRenameValue(selectedConversation.name);
+              }}
             />
 
             <IconTrash
@@ -142,6 +189,10 @@ export const ConversationComponent: FC<Props> = ({
               size={18}
               onClick={(e) => {
                 e.stopPropagation();
+                setIsDeleting(true);
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
                 setIsDeleting(true);
               }}
             />
