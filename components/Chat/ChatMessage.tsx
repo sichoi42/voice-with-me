@@ -5,11 +5,23 @@ import remarkGfm from 'remark-gfm';
 import { CodeBlock } from '../Markdown/CodeBlock';
 
 interface Props {
+  index: number;
   message: Message;
   lightMode: 'light' | 'dark';
 }
 
-export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
+export const ChatMessage: FC<Props> = ({ index, message, lightMode }) => {
+  const speakMessage = (content: string, rate: number) => {
+    const utterance = new SpeechSynthesisUtterance(content);
+    utterance.lang = 'ko-KR';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  };
+
   return (
     <div
       className={`group ${
@@ -18,6 +30,28 @@ export const ChatMessage: FC<Props> = ({ message, lightMode }) => {
           : 'text-gray-800 dark:text-gray-100 border-b border-black/10 dark:border-gray-900/50 bg-white dark:bg-[#343541]'
       }`}
       style={{ overflowWrap: 'anywhere' }}
+      tabIndex={index + 1}
+      // Add Mouse or Touch Event to Speak Message Content
+      onMouseOver={() => {
+        speakMessage(message.content, 1);
+      }}
+      onClick={() => {
+        speakMessage(message.content, 1);
+      }}
+      onTouchEnd={(event) => {
+        speakMessage(message.content, 1);
+        event.preventDefault();
+      }}
+      onFocus={() => {
+        speakMessage(message.content, 1);
+      }}
+      // Add Mouse or Touch Event to Stop Speaking
+      onMouseLeave={() => {
+        stopSpeaking();
+      }}
+      onBlur={() => {
+        stopSpeaking();
+      }}
     >
       <div className="text-base gap-4 md:gap-6 md:max-w-2xl lg:max-w-2xl xl:max-w-3xl p-4 md:py-6 flex lg:px-0 m-auto">
         <div className="font-bold min-w-[40px]">

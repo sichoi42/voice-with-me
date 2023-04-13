@@ -161,6 +161,7 @@ export const Chat: FC<Props> = ({
                 {conversation.messages.map((message, index) => (
                   <ChatMessage
                     key={index}
+                    index={index}
                     message={message}
                     lightMode={lightMode}
                   />
