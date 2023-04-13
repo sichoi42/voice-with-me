@@ -63,6 +63,17 @@ export const Sidebar: FC<Props> = ({
   const [filteredConversations, setFilteredConversations] =
     useState<Conversation[]>(conversations);
 
+  const speakMessage = (content: string, rate: number) => {
+    const utterance = new SpeechSynthesisUtterance(content);
+    utterance.lang = 'ko-KR';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  };
+
   const handleUpdateConversation = (
     conversation: Conversation,
     data: KeyValuePair,
@@ -121,8 +132,27 @@ export const Sidebar: FC<Props> = ({
         <button
           className="flex gap-3 p-3 items-center w-[190px] rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm flex-shrink-0 border border-white/20"
           onClick={() => {
+            speakMessage('새로운 대화를 시작합니다.', 1);
             onNewConversation();
             setSearchTerm('');
+          }}
+          onMouseOver={() => {
+            speakMessage('새로운 대화를 시작하시려면 클릭해주세요.', 1);
+          }}
+          onTouchEnd={(event) => {
+            speakMessage('새로운 대화를 시작합니다.', 1);
+            event.preventDefault();
+            onNewConversation();
+            setSearchTerm('');
+          }}
+          onFocus={() => {
+            speakMessage('새로운 대화를 시작하시려면 엔터를 입력해주세요.', 1);
+          }}
+          onMouseLeave={() => {
+            stopSpeaking();
+          }}
+          onBlur={() => {
+            stopSpeaking();
           }}
         >
           <IconPlus size={16} />
