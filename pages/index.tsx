@@ -44,6 +44,17 @@ export default function Home() {
 
   const stopConversationRef = useRef<boolean>(false);
 
+  const speakMessage = (message: string) => {
+    const utterance = new SpeechSynthesisUtterance(message);
+    utterance.lang = 'ko-KR';
+    utterance.rate = 1;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  };
+
   const handleSend = async (message: Message, isResend: boolean) => {
     if (selectedConversation) {
       let updatedConversation: Conversation;
@@ -121,6 +132,9 @@ export default function Home() {
       let isFirst = true;
       let text = '';
 
+      let speakChunk = '';
+      const punctuations = ['.', '!', '?'];
+
       while (!done) {
         if (stopConversationRef.current === true) {
           controller.abort();
@@ -132,6 +146,14 @@ export default function Home() {
         const chunkValue = decoder.decode(value);
 
         text += chunkValue;
+        speakChunk += chunkValue;
+
+        if (speakChunk.length > 0) {
+          if (punctuations.includes(speakChunk[speakChunk.length - 1])) {
+            speakMessage(speakChunk);
+            speakChunk = '';
+          }
+        }
 
         if (isFirst) {
           isFirst = false;
