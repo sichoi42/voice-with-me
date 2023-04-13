@@ -193,6 +193,28 @@ export default function Home() {
     }
   };
 
+  const handleSendAudio = async (audioFile: FormData) => {
+    const response = await fetch('/api/audio', {
+      method: 'POST',
+      body: audioFile,
+    });
+
+    if (!response.ok) {
+      setMessageError(true);
+      return;
+    }
+
+    const data = await response.json();
+
+    await handleSend(
+      {
+        role: 'user',
+        content: data.message,
+      },
+      false,
+    );
+  };
+
   const fetchModels = async (key: string) => {
     const response = await fetch('/api/models', {
       method: 'POST',
@@ -526,6 +548,7 @@ export default function Home() {
               loading={loading}
               lightMode={lightMode}
               onSend={handleSend}
+              onSendAudio={handleSendAudio}
               onUpdateConversation={handleUpdateConversation}
               onAcceptEnv={handleEnvChange}
               stopConversationRef={stopConversationRef}

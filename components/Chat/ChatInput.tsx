@@ -8,21 +8,26 @@ import {
   useRef,
   useState,
 } from 'react';
+import { VoiceChat } from './VoiceChat';
 
 interface Props {
   messageIsStreaming: boolean;
   onSend: (message: Message) => void;
+  onSendAudio: (audioFile: FormData) => void;
   model: OpenAIModel;
   stopConversationRef: MutableRefObject<boolean>;
   textareaRef: MutableRefObject<HTMLTextAreaElement | null>;
+  mikeRef: MutableRefObject<HTMLButtonElement | null>;
 }
 
 export const ChatInput: FC<Props> = ({
   onSend,
+  onSendAudio,
   messageIsStreaming,
   model,
   stopConversationRef,
   textareaRef,
+  mikeRef,
 }) => {
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -93,6 +98,9 @@ export const ChatInput: FC<Props> = ({
 
   return (
     <div className="absolute bottom-0 left-0 w-full dark:border-white/20 border-transparent dark:bg-[#444654] dark:bg-gradient-to-t from-[#343541] via-[#343541] to-[#343541]/0 bg-white dark:!bg-transparent dark:bg-vert-dark-gradient pt-6 md:pt-2">
+      <div className="px-3 pt-2 pb-3 text-center text-xs text-black/50 dark:text-white/50 md:px-4 md:pt-3 md:pb-6">
+        <VoiceChat onSendAudio={onSendAudio} mikeRef={mikeRef} />
+      </div>
       <div className="stretch mx-2 md:mt-[52px] mt-4 flex flex-row gap-3 last:mb-2 md:mx-4 md:last:mb-6 lg:mx-auto lg:max-w-3xl">
         {messageIsStreaming && (
           <button

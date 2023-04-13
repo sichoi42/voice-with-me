@@ -18,6 +18,7 @@ interface Props {
   loading: boolean;
   lightMode: 'light' | 'dark';
   onSend: (message: Message, isResend: boolean) => void;
+  onSendAudio: (audioFile: FormData) => void;
   onUpdateConversation: (
     conversation: Conversation,
     data: KeyValuePair,
@@ -37,6 +38,7 @@ export const Chat: FC<Props> = ({
   loading,
   lightMode,
   onSend,
+  onSendAudio,
   onUpdateConversation,
   onAcceptEnv,
   stopConversationRef,
@@ -47,6 +49,7 @@ export const Chat: FC<Props> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const mikeRef = useRef<HTMLButtonElement>(null);
 
   const scrollToBottom = () => {
     if (autoScrollEnabled) {
@@ -67,6 +70,21 @@ export const Chat: FC<Props> = ({
       }
     }
   };
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'F1') {
+        mikeRef.current?.focus();
+      } else if (e.key === 'Escape') {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -189,11 +207,13 @@ export const Chat: FC<Props> = ({
             <ChatInput
               stopConversationRef={stopConversationRef}
               textareaRef={textareaRef}
+              mikeRef={mikeRef}
               messageIsStreaming={messageIsStreaming}
               onSend={(message) => {
                 setCurrentMessage(message);
                 onSend(message, false);
               }}
+              onSendAudio={onSendAudio}
               model={conversation.model}
             />
           )}
