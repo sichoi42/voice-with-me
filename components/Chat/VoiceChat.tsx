@@ -1,5 +1,6 @@
 import { FC, MutableRefObject, useRef, useState } from 'react';
 import { IconMicrophone, IconPlayerStop } from '@tabler/icons-react';
+import { v4 as uuid4 } from 'uuid';
 
 interface VoiceChatProps {
   onSendAudio: (audioFile: FormData) => void;
@@ -47,7 +48,7 @@ export const VoiceChat: FC<VoiceChatProps> = ({ onSendAudio, mikeRef }) => {
         audioChunks.splice(0);
 
         const formData = new FormData();
-        formData.append('audio', blob, 'recording.mp3');
+        formData.append('audio', blob, `${uuid4()}.mp3`);
         onSendAudio(formData);
       };
       mediaRecorderRef.current = mediaRecorder;
