@@ -12,22 +12,16 @@ import {
 
 interface CategorizeModalProps {
   setCategorizeModalOpen: Dispatch<SetStateAction<boolean>>;
+  onCategorySelect: (category: Category) => void;
 }
 
 export const CategorizeModal: FC<CategorizeModalProps> = ({
   setCategorizeModalOpen,
+  onCategorySelect,
 }) => {
-  const handleNewsSummary = async (category: Category) => {
-    console.log(category);
-    // const response = await fetch('/api/news-summary', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ category: category }),
-    // });
-
+  const handleButtonClick = async (category: Category) => {
     setCategorizeModalOpen(false);
+    onCategorySelect(category);
   };
 
   return (
@@ -70,7 +64,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconHammer size={1} />
                   <CategorySelectButton
                     category={Category.POLITICS}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
 
@@ -78,7 +72,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconBriefcase size={1} />
                   <CategorySelectButton
                     category={Category.ECONOMY}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
 
@@ -86,7 +80,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconUsers size={1} />
                   <CategorySelectButton
                     category={Category.SOCIETY}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
 
@@ -94,7 +88,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconBook size={1} />
                   <CategorySelectButton
                     category={Category.LIFE}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
 
@@ -102,7 +96,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconBrandCampaignmonitor size={1} />
                   <CategorySelectButton
                     category={Category.IT}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
 
@@ -110,7 +104,7 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
                   <IconGlobe size={1} />
                   <CategorySelectButton
                     category={Category.WORLD}
-                    onButtonClick={handleNewsSummary}
+                    onButtonClick={handleButtonClick}
                   />
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { Navbar } from '@/components/Mobile/Navbar';
 import { CategorizeModal } from '@/components/News/CategorizeModal';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import {
+  Category,
   ChatBody,
   ChatFolder,
   Conversation,
@@ -108,6 +109,7 @@ export default function Home() {
 
       // 응답 코드가 202 accepted 일 경우
       // 사용자에게 카테고리 선택을 하도록 하는 모달을 띄워준다.
+      console.log(response.status);
       if (response.status === 202) {
         setCategorizeModalOpen(true);
         setLoading(false);
@@ -247,6 +249,157 @@ export default function Home() {
       },
       false,
     );
+  };
+
+  const handleNewsSummary = async (category: Category) => {
+    if (!selectedConversation) {
+      return;
+    }
+
+    const message: Message = { role: 'user', content: category };
+
+    let updatedConversation: Conversation = {
+      ...selectedConversation,
+      messages: [...selectedConversation.messages, message],
+    };
+
+    setSelectedConversation(updatedConversation);
+    setLoading(true);
+    setMessageIsStreaming(true);
+    setMessageError(false);
+
+    const chatBody: ChatBody = {
+      model: updatedConversation.model,
+      messages: updatedConversation.messages,
+      key: apiKey,
+      prompt: updatedConversation.prompt,
+    };
+
+    const controller = new AbortController();
+    const response = await fetch('/api/news-summary', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body: JSON.stringify({ ...chatBody, category }),
+    });
+
+    if (!response.ok) {
+      setLoading(false);
+      setMessageIsStreaming(false);
+      setMessageError(true);
+      return;
+    }
+
+    const data = response.body;
+
+    if (!data) {
+      setLoading(false);
+      setMessageIsStreaming(false);
+      setMessageError(true);
+
+      return;
+    }
+
+    if (updatedConversation.messages.length === 1) {
+      const { content } = message;
+      const customName =
+        content.length > 30 ? content.substring(0, 30) + '...' : content;
+
+      updatedConversation = {
+        ...updatedConversation,
+        name: customName,
+      };
+    }
+
+    setLoading(false);
+
+    const reader = data.getReader();
+    const decoder = new TextDecoder();
+    let done = false;
+    let isFirst = true;
+    let text = '';
+
+    let speakChunk = '';
+    const punctuations = ['.', '!', '?'];
+
+    while (!done) {
+      if (stopConversationRef.current === true) {
+        controller.abort();
+        done = true;
+        break;
+      }
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      const chunkValue = decoder.decode(value);
+
+      text += chunkValue;
+      speakChunk += chunkValue;
+
+      if (speakChunk.length > 0) {
+        if (punctuations.includes(speakChunk[speakChunk.length - 1])) {
+          speakMessage(speakChunk);
+          speakChunk = '';
+        }
+      }
+
+      if (isFirst) {
+        isFirst = false;
+        const updatedMessages: Message[] = [
+          ...updatedConversation.messages,
+          { role: 'assistant', content: chunkValue },
+        ];
+
+        updatedConversation = {
+          ...updatedConversation,
+          messages: updatedMessages,
+        };
+
+        setSelectedConversation(updatedConversation);
+      } else {
+        const updatedMessages: Message[] = updatedConversation.messages.map(
+          (message, index) => {
+            if (index === updatedConversation.messages.length - 1) {
+              return {
+                ...message,
+                content: text,
+              };
+            }
+
+            return message;
+          },
+        );
+
+        updatedConversation = {
+          ...updatedConversation,
+          messages: updatedMessages,
+        };
+
+        setSelectedConversation(updatedConversation);
+      }
+    }
+    saveConversation(updatedConversation);
+
+    const updatedConversations: Conversation[] = conversations.map(
+      (conversation) => {
+        if (conversation.id === selectedConversation.id) {
+          return updatedConversation;
+        }
+
+        return conversation;
+      },
+    );
+
+    if (updatedConversations.length === 0) {
+      updatedConversations.push(updatedConversation);
+    }
+
+    setConversations(updatedConversations);
+
+    saveConversations(updatedConversations);
+
+    setMessageIsStreaming(false);
   };
 
   const fetchModels = async (key: string) => {
@@ -538,6 +691,7 @@ export default function Home() {
             {categorizeModalOpen && (
               <CategorizeModal
                 setCategorizeModalOpen={setCategorizeModalOpen}
+                onCategorySelect={handleNewsSummary}
               />
             )}
             {showSidebar ? (
