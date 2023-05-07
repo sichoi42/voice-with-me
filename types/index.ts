@@ -61,3 +61,13 @@ export interface LocalStorage {
   // added folders (3/23/23)
   folders: ChatFolder[];
 }
+
+// 정치, 경제, 사회, 생활/문화, IT/과학, 세계
+export enum Category {
+  POLITICS = '정치',
+  ECONOMY = '경제',
+  SOCIETY = '사회',
+  LIFE = '생활/문화',
+  IT = 'IT/과학',
+  WORLD = '세계',
+}

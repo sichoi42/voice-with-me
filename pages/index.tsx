@@ -1,5 +1,6 @@
 import { Chat } from '@/components/Chat/Chat';
 import { Navbar } from '@/components/Mobile/Navbar';
+import { CategorizeModal } from '@/components/News/CategorizeModal';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import {
   ChatBody,
@@ -41,6 +42,8 @@ export default function Home() {
   const [messageError, setMessageError] = useState<boolean>(false);
   const [modelError, setModelError] = useState<boolean>(false);
   const [isUsingEnv, setIsUsingEnv] = useState<boolean>(false);
+  const [categorizeModalOpen, setCategorizeModalOpen] =
+    useState<boolean>(false);
 
   const stopConversationRef = useRef<boolean>(false);
 
@@ -100,6 +103,15 @@ export default function Home() {
         setLoading(false);
         setMessageIsStreaming(false);
         setMessageError(true);
+        return;
+      }
+
+      // 응답 코드가 202 accepted 일 경우
+      // 사용자에게 카테고리 선택을 하도록 하는 모달을 띄워준다.
+      if (response.status === 202) {
+        setCategorizeModalOpen(true);
+        setLoading(false);
+        setMessageIsStreaming(false);
         return;
       }
 
@@ -523,6 +535,11 @@ export default function Home() {
           </div>
 
           <article className="flex h-full w-full pt-[48px] sm:pt-0">
+            {categorizeModalOpen && (
+              <CategorizeModal
+                setCategorizeModalOpen={setCategorizeModalOpen}
+              />
+            )}
             {showSidebar ? (
               <>
                 <Sidebar
