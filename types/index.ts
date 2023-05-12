@@ -71,3 +71,20 @@ export enum Category {
   IT = 'IT/과학',
   WORLD = '세계',
 }
+
+export interface ChatBodyWithNewsCategory {
+  model: OpenAIModel;
+  key: string;
+  prompt: string;
+  category: Category;
+}
+
+export interface NewsSummary {
+  title: string;
+  content: string;
+  url: string;
+  publisher: string;
+  publishedAt: Date;
+  writer: string;
+  category: Category;
+}

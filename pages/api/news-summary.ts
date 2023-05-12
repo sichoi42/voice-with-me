@@ -1,10 +1,12 @@
-import { ChatBody, Message, OpenAIModelID } from '@/types';
+import { ChatBodyWithNewsCategory, Message, OpenAIModelID } from '@/types';
 import { init, Tiktoken } from '@dqbd/tiktoken/lite/init';
 import tiktokenModel from '@dqbd/tiktoken/encoders/cl100k_base.json';
 // @ts-expect-error
 import wasm from '../../node_modules/@dqbd/tiktoken/lite/tiktoken_bg.wasm?module';
 import { DEFAULT_SYSTEM_PROMPT } from '@/utils/app/const';
 import { OpenAIStream } from '@/utils/server';
+import { getNewsSummary } from '@/utils/server/news.summary';
+import { getNewsSummaryPrompt } from '@/utils/server/news.summary.prompt';
 
 export const config = {
   runtime: 'edge',
@@ -12,12 +14,16 @@ export const config = {
 
 const handler = async (req: Request): Promise<Response> => {
   try {
-    // const { model, messages, key, prompt, category } = await req.json();
+    const { model, key, prompt, category } =
+      (await req.json()) as ChatBodyWithNewsCategory;
 
-    const body = await req.json();
-    const { model, messages, key, prompt, category } = body;
-
-    console.log('called news-summary api');
+    const newsInfo = await getNewsSummary(category);
+    const newsMessage: Message[] = [
+      {
+        role: 'user',
+        content: getNewsSummaryPrompt(newsInfo),
+      },
+    ];
 
     await init((imports) => WebAssembly.instantiate(wasm, imports));
     const encoding = new Tiktoken(
@@ -36,22 +42,15 @@ const handler = async (req: Request): Promise<Response> => {
     const prompt_tokens = encoding.encode(promptToSend);
 
     let tokenCount = prompt_tokens.length;
-    let messagesToSend: Message[] = [];
 
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      const tokens = encoding.encode(message.content);
-
-      if (tokenCount + tokens.length > tokenLimit) {
-        break;
-      }
-      tokenCount += tokens.length;
-      messagesToSend = [message, ...messagesToSend];
+    const tokens = encoding.encode(newsMessage[0].content);
+    if (tokenCount + tokens.length > tokenLimit) {
+      return new Response('Too long news summary', { status: 400 });
     }
 
     encoding.free();
 
-    const stream = await OpenAIStream(model, promptToSend, key, messagesToSend);
+    const stream = await OpenAIStream(model, promptToSend, key, newsMessage);
 
     return new Response(stream);
   } catch (error) {

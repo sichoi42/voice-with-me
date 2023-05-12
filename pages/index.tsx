@@ -109,7 +109,6 @@ export default function Home() {
 
       // 응답 코드가 202 accepted 일 경우
       // 사용자에게 카테고리 선택을 하도록 하는 모달을 띄워준다.
-      console.log(response.status);
       if (response.status === 202) {
         setCategorizeModalOpen(true);
         setLoading(false);
@@ -282,7 +281,12 @@ export default function Home() {
         'Content-Type': 'application/json',
       },
       signal: controller.signal,
-      body: JSON.stringify({ ...chatBody, category }),
+      body: JSON.stringify({
+        model: chatBody.model,
+        key: chatBody.key,
+        prompt: chatBody.prompt,
+        category: category,
+      }),
     });
 
     if (!response.ok) {
