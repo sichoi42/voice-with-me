@@ -289,6 +289,19 @@ export default function Home() {
       }),
     });
 
+    // 응답 결과가 404 Not Found 일 경우
+    // 사용자에게 카테고리 선택을 하도록 하는 모달을 띄워준다.
+    if (response.status === 404) {
+      setLoading(false);
+      setMessageIsStreaming(false);
+      speakMessage(
+        `${category} 분야의 뉴스를 찾을 수 없습니다. 다른 카테고리를 선택해주세요.`,
+      );
+      setTimeout(() => {
+        setCategorizeModalOpen(true);
+      }, 5000);
+    }
+
     if (!response.ok) {
       setLoading(false);
       setMessageIsStreaming(false);

@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { CategorySelectButton } from './CategorySelectButton';
 import { Category } from '@/types';
 import {
@@ -23,6 +23,26 @@ export const CategorizeModal: FC<CategorizeModalProps> = ({
     setCategorizeModalOpen(false);
     onCategorySelect(category);
   };
+
+  const speakMessage = (content: string, rate: number) => {
+    const utterance = new SpeechSynthesisUtterance(content);
+    utterance.lang = 'ko-KR';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+  };
+
+  useEffect(() => {
+    speakMessage('요약을 원하는 뉴스 기사 카테고리를 선택해주세요.', 1);
+    speakMessage('선택할 수 있는 카테고리는 다음과 같습니다.', 1);
+
+    return () => {
+      stopSpeaking();
+    };
+  }, []);
 
   return (
     <div className="fixed z-50 inset-0 overflow-y-auto">

@@ -37,12 +37,10 @@ export default async function handler(req: NextApiRequest) {
   try {
     const buffer = req.body as ReadableStream;
     const { model, key, prompt, category } = await parseStream(buffer);
-    console.log(model, key, prompt, category);
     const news = (await getRandomNews(category)) as NewsSummary;
     if (!news) {
       return new Response('No news found', { status: 404 });
     }
-    console.log(news);
 
     const newsMessage: Message[] = [
       {
