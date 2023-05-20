@@ -1,10 +1,28 @@
-FROM python:3.9-slim
+FROM python:3.11.3-slim AS builder
 
-# 소스 코드 복사
+RUN apt-get update && \
+    apt-get install -y libpq-dev gcc
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY ./requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+FROM python:3.11.3-slim
+
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /opt/venv /opt/venv
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
 COPY ./scrapper.py .
 
-# 필요한 패키지 설치
-RUN pip install --no-cache-dir requests beautifulsoup4 schedule psycopg2 dotenv
-
-# 소스 코드 실행 명령
 CMD ["python", "scrapper.py"]
+

@@ -5,11 +5,13 @@ services:
     build: .
     ports:
       - 3000:3000
-    environment:
-      - 'OPENAI_API_KEY='
+    env_file:
+      - .env
 
   scrapper:
     build:
-      context:
-        dockerfile: ./scrapper/Dockerfile
-      restart: always
+      context: ./scrapper/
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
