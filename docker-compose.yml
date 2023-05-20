@@ -7,3 +7,9 @@ services:
       - 3000:3000
     environment:
       - 'OPENAI_API_KEY='
+
+  scrapper:
+    build:
+      context:
+        dockerfile: ./scrapper/Dockerfile
+      restart: always
