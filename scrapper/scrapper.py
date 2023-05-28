@@ -173,15 +173,15 @@ def save_news(news, conn):
 
 def scrapper_trigger():
     print("스크래핑 시작")
-    # conn = psycopg2.connect(
-    #     host=os.environ.get('DB_HOST'),
-    #     port=os.environ.get('DB_PORT'),
-    #     database=os.environ.get('DB_DATABASE'),
-    #     user=os.environ.get('DB_USER'),
-    #     password=os.environ.get('DB_PASSWORD')
-    # )
-    # scrape_news_list(conn)
-    # conn.close()
+    conn = psycopg2.connect(
+        host=os.environ.get('DB_HOST'),
+        port=os.environ.get('DB_PORT'),
+        database=os.environ.get('DB_DATABASE'),
+        user=os.environ.get('DB_USER'),
+        password=os.environ.get('DB_PASSWORD')
+    )
+    scrape_news_list(conn)
+    conn.close()
 
 
 # # 매 정각 스크래핑 함수 실행

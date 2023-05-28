@@ -28,5 +28,11 @@ jobs:
           path: "./scrapper/requirements.txt"
 
       - name: 스크래퍼 실행
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           python3 ./scrapper/scrapper.py
