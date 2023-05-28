@@ -1,0 +1,32 @@
+name: Python Script Workflow
+
+# on:
+#   schedule:
+#   # 1시간에 한 번씩
+#     - cron: '0 * * * *'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 파이썬 버전 설정
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: 의존 모듈 설치
+        uses: py-actions/py-dependency-install@v4
+        with:
+          path: "requirements.txt"
+
+      - name: 스크래퍼 실행
+        run: |
+          python3 ./scrapper/scrapper.py

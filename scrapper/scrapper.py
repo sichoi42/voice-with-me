@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import schedule
+# import schedule
 import psycopg2
 from dotenv import load_dotenv
 
@@ -184,13 +184,13 @@ def scrapper_trigger():
     # conn.close()
 
 
-# 매 정각 스크래핑 함수 실행
-schedule.every().hour.at(":00").do(scrapper_trigger)
+# # 매 정각 스크래핑 함수 실행
+# schedule.every().hour.at(":00").do(scrapper_trigger)
 
 # 서버 가동 후 1회 스크래핑 함수 실행
-# scrapper_trigger()
+scrapper_trigger()
 
-# 스케줄러 실행
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# # 스케줄러 실행
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
