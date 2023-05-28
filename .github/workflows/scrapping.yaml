@@ -1,13 +1,9 @@
 name: Python Scrapper Action
 
-# on:
-#   schedule:
-#   # 1시간에 한 번씩
-#     - cron: '0 * * * *'
 on:
-  push:
-    branches:
-      - main
+  schedule:
+  # 1시간에 한 번씩
+    - cron: '0 * * * *'
 
 jobs:
   build:
