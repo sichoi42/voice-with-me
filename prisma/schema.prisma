@@ -8,13 +8,14 @@ generator client {
   provider        = "prisma-client-js"
 }
 
-model News {
+model news {
   id        Int      @id @default(autoincrement())
+  nid      String   @unique
   title String?
   content String?
   url String?
   publisher String?
-  publishedAt DateTime?
+  published_at DateTime?
   writer String?
   category String
 }

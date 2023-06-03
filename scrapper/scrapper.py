@@ -22,6 +22,7 @@ headers = ['h1', 'h2', 'h3']
 
 
 class NewsSummary:
+    nid: str
     title: str
     content: str
     url: str
@@ -39,6 +40,12 @@ def scrape_news_article(url):
             news = NewsSummary()
             news.url = url
             # print(news.url)
+
+            # https://n.news.naver.com/article/437/0000345687?sid=100
+            # nid is 0000345687
+            nid = url.split("/")[-1].split("?")[0]
+            news.nid = nid
+            # print(news.nid)
 
             # url에서 sid 파라미터를 찾아서 이 값을 key로하는 value를 category에 저장
             parsed_url = urlparse(url)
@@ -165,8 +172,17 @@ def scrape_news_list(conn):
 
 def save_news(news, conn):
     cur = conn.cursor()
-    cur.execute("INSERT INTO \"News\" (title, content, url, publisher, \"publishedAt\", writer, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                (news.title, news.content, news.url, news.publisher, news.published_at, news.writer, news.category))
+    cur.execute("INSERT INTO news (nid, title, content, url, publisher, published_at, writer, category) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (news.nid, news.title, news.content, news.url, news.publisher, news.published_at, news.writer, news.category))
+    conn.commit()
+    cur.close()
+
+
+def delete_old_news(conn):
+    cur = conn.cursor()
+    # 현재 시간으로부터 48시간 이전에 작성된 뉴스를 삭제
+    cur.execute(
+        "DELETE FROM news WHERE published_at < NOW() - INTERVAL '48 hours'")
     conn.commit()
     cur.close()
 
@@ -181,6 +197,7 @@ def scrapper_trigger():
         password=os.environ.get('DB_PASSWORD')
     )
     scrape_news_list(conn)
+    delete_old_news(conn)
     conn.close()
 
 
