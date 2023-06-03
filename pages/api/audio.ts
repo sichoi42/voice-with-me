@@ -1,16 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import multer from 'multer';
 import { whisperRecognize } from '@/utils/server/whisper';
-import fs from 'fs';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
-  },
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -40,12 +32,8 @@ const audioHandler = async (req: any, res: any) => {
     try {
       // Process the audio file
       const audioFile = req.file;
-
-      const filePath = audioFile.path;
-      console.log('filePath:', filePath);
-      const questionText = await whisperRecognize(filePath);
-      console.log('questionText:', questionText);
-      fs.unlinkSync(filePath);
+      console.log('audioFile:', audioFile);
+      const questionText = await whisperRecognize(audioFile);
       return res.status(200).json({ message: questionText });
     } catch (err) {
       console.error(err);

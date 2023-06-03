@@ -1,22 +1,20 @@
-import { Configuration, OpenAIApi } from 'openai';
-import fs from 'fs';
+import axios from 'axios';
 
-const configuration = new Configuration({
-  organization: process.env.ORGANIZATION_ID,
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-export const whisperRecognize = async (audioUrl: any) => {
-  const openai = new OpenAIApi(configuration);
-  const stream = fs.createReadStream(audioUrl) as any;
-  const resp = await openai.createTranscription(
-    stream,
-    'whisper-1',
-    undefined,
-    undefined,
-    0,
-    'ko',
+export const whisperRecognize = async (audioFile: any) => {
+  const form = new FormData();
+  form.append('file', new Blob([audioFile.buffer]), audioFile.originalname);
+  form.append('model', 'whisper-1');
+  form.append('temperature', '0');
+  form.append('language', 'ko');
+  const headers = {
+    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    Accept: 'application/json',
+  };
+  const response = await axios.post(
+    'https://api.openai.com/v1/audio/transcriptions',
+    form,
+    { headers },
   );
-
-  return resp?.data?.text;
+  console.log(response.data.text);
+  return response.data.text;
 };
