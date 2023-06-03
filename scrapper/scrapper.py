@@ -180,9 +180,11 @@ def save_news(news, conn):
 
 def delete_old_news(conn):
     cur = conn.cursor()
-    # 현재 시간으로부터 48시간 이전에 작성된 뉴스를 삭제
+    # 현재 시간으로부터 3일 이상 지난 뉴스 삭제
     cur.execute(
-        "DELETE FROM news WHERE published_at < NOW() - INTERVAL '48 hours'")
+        "DELETE FROM news WHERE extract(day from age(now(), published_at)) > 2")
+    print(cur.query)
+    print(cur.statusmessage)
     conn.commit()
     cur.close()
 
@@ -196,6 +198,7 @@ def scrapper_trigger():
         user=os.environ.get('DB_USER'),
         password=os.environ.get('DB_PASSWORD')
     )
+    conn.autocommit = True
     scrape_news_list(conn)
     delete_old_news(conn)
     conn.close()

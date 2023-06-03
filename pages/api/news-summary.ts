@@ -1,7 +1,7 @@
 import {
+  Category,
   ChatBodyWithNewsCategory,
   Message,
-  NewsSummary,
   OpenAIModelID,
 } from '@/types';
 import { init, Tiktoken } from '@dqbd/tiktoken/lite/init';
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest) {
   try {
     const buffer = req.body as ReadableStream;
     const { model, key, prompt, category } = await parseStream(buffer);
-    const news = (await getRandomNews(category)) as NewsSummary;
+    const news = await getRandomNews(category);
     if (!news) {
       return new Response('No news found', { status: 404 });
     }
@@ -45,7 +45,15 @@ export default async function handler(req: NextApiRequest) {
     const newsMessage: Message[] = [
       {
         role: 'user',
-        content: getNewsSummaryPrompt(news),
+        content: getNewsSummaryPrompt({
+          title: news.title as string,
+          content: news.content as string,
+          url: news.url as string,
+          publisher: news.publisher as string,
+          publishedAt: news.published_at as Date,
+          writer: news.writer as string,
+          category: news.category as Category,
+        }),
       },
     ];
 
