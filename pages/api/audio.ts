@@ -32,8 +32,10 @@ const audioHandler = async (req: any, res: any) => {
     try {
       // Process the audio file
       const audioFile = req.file;
-      console.log('audioFile:', audioFile);
-      const questionText = await whisperRecognize(audioFile);
+      const questionText = await whisperRecognize(
+        audioFile,
+        req.body.key as string,
+      );
       return res.status(200).json({ message: questionText });
     } catch (err) {
       console.error(err);

@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-export const whisperRecognize = async (audioFile: any) => {
+export const whisperRecognize = async (audioFile: any, key: string) => {
   const form = new FormData();
   form.append('file', new Blob([audioFile.buffer]), audioFile.originalname);
   form.append('model', 'whisper-1');
   form.append('temperature', '0');
   form.append('language', 'ko');
   const headers = {
-    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
     Accept: 'application/json',
   };
   const response = await axios.post(

@@ -229,6 +229,7 @@ export default function Home() {
   };
 
   const handleSendAudio = async (audioFile: FormData) => {
+    audioFile.append('key', apiKey);
     const response = await fetch('/api/audio', {
       method: 'POST',
       body: audioFile,
