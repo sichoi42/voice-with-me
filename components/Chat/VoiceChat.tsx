@@ -44,11 +44,11 @@ export const VoiceChat: FC<VoiceChatProps> = ({ onSendAudio, mikeRef }) => {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const blob = new Blob(audioChunks, { type: 'audio/wav' });
         audioChunks.splice(0);
 
         const formData = new FormData();
-        formData.append('audio', blob, `${uuid4()}.mp3`);
+        formData.append('audio', blob, `${uuid4()}.wav`);
         onSendAudio(formData);
       };
       mediaRecorderRef.current = mediaRecorder;
