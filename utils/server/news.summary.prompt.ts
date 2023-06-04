@@ -13,11 +13,12 @@ export const getNewsSummaryPrompt = (newsInfo: NewsSummary) => {
   5. 답변 길이: utf-8 인코딩 기준 최대 1500바이트
   6. 기사 카테고리: ${category}
   7. 추가 지시사항:
-  뉴스 내용과 관련해서 미래에 어떤 사건이 일어날 것임이 담겨있다면, 요약에 꼭 포함시켜줘. (구체적인 시간까지)
-
-  추가로 답변은 내가 했던 것처럼 반말로 해줘.
-  답변의 시작은 이런 형태로 해줘: 오늘 xx시에 ${category} 분야에 올라온 뉴스야. (xx시는 해당 뉴스가 작성된 시간이야. 작성 시간은 아래 기사 내용 상단 부분에 있어.)
-  답변의 끝에는 꼭 원본 뉴스 기사의 링크를 포함시켜줘.
+    - 답변은 내가 했던 것처럼 반말로 해줘.
+    - 답변의 시작을 아래 내용을 고려하여 일관된 형식으로 작성해줘.
+      - 만약 작성일이 오늘 날짜와 같다면: 오늘 ${publishedAt.getHours()}시에 ${category} 분야에 올라온 뉴스야.
+      - 만약 작성일이 오늘 날짜보다 하루 전이라면: 어제 ${publishedAt.getHours()}시에 ${category} 분야에 올라온 뉴스야.
+      - 그 외: ${publishedAt.getDate()}일 ${publishedAt.getHours()}시에 ${category} 분야에 올라온 뉴스야.
+    - 답변의 끝에는 꼭 원본 뉴스 기사의 링크를 포함시켜줘.
   """
   기사 제목: ${title}
   작성일: ${publishedAt}
@@ -26,5 +27,7 @@ export const getNewsSummaryPrompt = (newsInfo: NewsSummary) => {
   기사 본문 내용: ${content}
   기사 링크: ${url}
   """
+
+  답변은 반말로 해야한다는 걸 잊지 말아줘.
   `;
 };

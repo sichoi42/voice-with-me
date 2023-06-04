@@ -14,12 +14,12 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { model, messages, key, prompt } = (await req.json()) as ChatBody;
 
-    // 메세지의 마지막 내용에서 "뉴스" 와 "요약"이라는 단어가 들어가면
+    // 메세지의 마지막 내용에서 "기사" 와 "요약"이라는 단어가 들어가면
     // 클라이언트로 하여금 뉴스 카테고리를 선택하도록 202 응답을 보낸다.
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (
-        lastMessage.content.includes('뉴스') &&
+        lastMessage.content.includes('기사') &&
         lastMessage.content.includes('요약')
       ) {
         return new Response('Select News Category', { status: 202 });
